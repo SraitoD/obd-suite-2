@@ -21,7 +21,7 @@ jobs:
 
       - name: Install web dependencies
         working-directory: ./web
-        run: npm install --no-audit --no-fund || true
+        run: npm install --no-audit --no-fund
 
       - name: Lint web
         working-directory: ./web
@@ -34,17 +34,21 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Install backend dependencies
         working-directory: ./backend
         run: |
-          pip install --upgrade pip || true
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
           pip install -r requirements.txt || true
 
       - name: Lint backend
         working-directory: ./backend
         run: |
+          python -m venv venv
+          source venv/bin/activate
           pip install black isort flake8 || true
           black --check . || true
           isort --check . || true
@@ -58,7 +62,7 @@ jobs:
 
       - name: Get mobile dependencies
         working-directory: ./mobile
-        run: flutter pub get || true
+        run: flutter pub get
 
       - name: Analyze mobile
         working-directory: ./mobile
