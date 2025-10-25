@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Tests
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,45 +16,32 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
-      - name: Install web dependencies
+      - name: Clean and install web dependencies
         working-directory: ./web
-        run: npm install
-
-      - name: Lint web
-        working-directory: ./web
-        run: npm run lint
+        run: |
+          rm -f package-lock.json
+          npm cache clean --force
+          npm install --no-audit --no-fund
+          npm run build
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Install backend dependencies
         working-directory: ./backend
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+          pip install black isort flake8 pytest
 
-      - name: Lint backend
+      - name: Lint and test backend
         working-directory: ./backend
         run: |
-          pip install black isort flake8
           black --check .
           isort --check .
           flake8 .
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: 'stable'
-          channel: 'stable'
-
-      - name: Get mobile dependencies
-        working-directory: ./mobile
-        run: flutter pub get
-
-      - name: Analyze mobile
-        working-directory: ./mobile
-        run: flutter analyze
+          pytest

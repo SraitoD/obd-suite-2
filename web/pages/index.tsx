@@ -3,7 +3,11 @@ import Head from 'next/head'
 import { useSession, signIn, signOut } from "next-auth/react"
 
 const Home: NextPage = () => {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
+
+  if (status === "loading") {
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -26,40 +30,63 @@ const Home: NextPage = () => {
               </button>
             </div>
           ) : (
-            <button
-              onClick={() => signIn("google")}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Connexion avec Google
-            </button>
+            <div className="flex flex-col items-end space-y-2">
+              <span className="text-gray-500 text-sm">Non connecté</span>
+              <button
+                onClick={() => signIn("google")}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Connexion avec Google
+              </button>
+            </div>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">État du véhicule</h2>
-            <div className="text-green-500">✅ Aucun code DTC actif</div>
-          </div>
+        {session ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-xl font-semibold mb-4">État du véhicule</h2>
+              <div className="text-green-500">✅ Aucun code DTC actif</div>
+            </div>
 
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Derniers trajets</h2>
-            <div className="space-y-2">
-              <div className="p-2 bg-gray-50 rounded">12/05 - 42 km - Consommation: 6.2L/100km</div>
-              <div className="p-2 bg-gray-50 rounded">11/05 - 18 km - Consommation: 7.1L/100km</div>
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-xl font-semibold mb-4">Derniers trajets</h2>
+              <div className="space-y-2">
+                <div className="p-2 bg-gray-50 rounded">12/05 - 42 km - Consommation: 6.2L/100km</div>
+                <div className="p-2 bg-gray-50 rounded">11/05 - 18 km - Consommation: 7.1L/100km</div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-xl font-semibold mb-4">Diagnostics récents</h2>
+              <div className="space-y-2">
+                <div className="p-2 bg-yellow-50 rounded">P0171 - Mélange trop pauvre (corrigé)</div>
+                <div className="p-2 bg-green-50 rounded">P0300 - Ratés d'allumage (en surveillance)</div>
+              </div>
             </div>
           </div>
-
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Diagnostics récents</h2>
-            <div className="space-y-2">
-              <div className="p-2 bg-yellow-50 rounded">P0171 - Mélange trop pauvre (corrigé)</div>
-              <div className="p-2 bg-green-50 rounded">P0300 - Ratés d'allumage (en surveillance)</div>
-            </div>
+        ) : (
+          <div className="bg-white p-8 rounded-lg shadow text-center max-w-md mx-auto">
+            <h2 className="text-xl font-semibold mb-4">Bienvenue dans OBD Suite 2</h2>
+            <p className="mb-6 text-gray-600">
+              Connectez-vous pour accéder à votre tableau de bord véhicule et consulter
+              les diagnostics, l'historique des trajets et les alertes en temps réel.
+            </p>
+            <button
+              onClick={() => signIn("google")}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Se connecter avec Google
+            </button>
           </div>
-        </div>
+        )}
       </main>
     </div>
   )
 }
+
+export const getServerSideProps = async () => ({
+  props: {}
+})
 
 export default Home
