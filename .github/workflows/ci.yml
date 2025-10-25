@@ -18,9 +18,15 @@ jobs:
         with:
           node-version: 18
 
+      - name: Clean web dependencies
+        working-directory: ./web
+        run: |
+          rm -f package-lock.json
+          npm cache clean --force
+
       - name: Install web dependencies
         working-directory: ./web
-        run: npm install
+        run: npm install --no-audit --no-fund
 
       - name: Lint web
         working-directory: ./web

@@ -21,8 +21,7 @@
     "postcss": "8.4.24",
     "tailwindcss": "3.3.2",
     "axios": "1.4.0",
-    "@next-auth/next": "4.22.1",
-    "next-auth": "4.22.1"
+    "next-auth": "latest"
   },
   "devDependencies": {
     "eslint": "8.43.0",
