@@ -29,9 +29,10 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", 
 # ----- Web -----
 FROM base AS web
 WORKDIR /app/web
-COPY web/package.json web/package-lock.json ./
-RUN npm install
+COPY web/package.json ./
+RUN npm install --no-audit --no-fund
 COPY web/ .
+RUN npm run build
 EXPOSE 3000
 
 # Dev stage
@@ -40,13 +41,12 @@ CMD ["npm", "run", "dev"]
 
 # Prod stage
 FROM web AS web-prod
-RUN npm run build
 CMD ["npm", "start"]
 
 # ----- Mobile -----
 FROM ghcr.io/cirruslabs/flutter:stable AS mobile
 WORKDIR /app/mobile
-COPY mobile/pubspec.yaml mobile/pubspec.lock ./
+COPY mobile/pubspec.yaml ./
 RUN flutter pub get
 COPY mobile/ .
 EXPOSE 3001
