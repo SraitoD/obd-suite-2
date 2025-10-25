@@ -6,10 +6,13 @@ WORKDIR /app
 RUN apk add --no-cache python3 py3-pip postgresql-client git openssh-client
 
 # ----- Backend -----
-FROM base AS backend
+FROM python:3.11-slim AS backend
 WORKDIR /app/backend
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 COPY backend/ .
 ENV PYTHONPATH=/app/backend
 
@@ -18,10 +21,11 @@ FROM backend AS dev
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 # Prod stage
-FROM python:3.9-slim AS prod
+FROM python:3.11-slim AS prod
 WORKDIR /app/backend
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 COPY --from=backend /app/backend .
-COPY --from=backend /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
 RUN apt-get update && apt-get install -y libpq5 && rm -rf /var/lib/apt/lists/*
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
