@@ -1,0 +1,36 @@
+[project]
+name = "obd-suite-backend"
+version = "0.1.0"
+description = "Backend API for OBD Suite 2"
+authors = [
+    {name = "OBD Suite Team", email = "team@obdsuite.example.com"}
+]
+dependencies = [
+    "fastapi==0.95.2",
+    "uvicorn==0.22.0",
+    "python-jose[cryptography]==3.3.0",
+    "passlib[bcrypt]==1.7.4",
+    "python-multipart==0.0.6",
+    "python-dotenv==1.0.0",
+    "psycopg2-binary==2.9.6",
+    "sqlalchemy==2.0.15",
+    "pydantic==1.10.7",
+    "httpx==0.24.1",
+    "google-auth==2.17.3",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest==7.4.0",
+    "pytest-cov==4.1.0",
+    "httpx==0.24.1",
+]
+
+[project.scripts]
+start = "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+start-prod = "uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4"
+
+[tool.pytest.ini_options]
+pythonpath = "."
+testpaths = ["tests"]
+addopts = "--cov=backend --cov-report=term-missing"

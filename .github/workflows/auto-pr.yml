@@ -4,6 +4,9 @@ on:
   push:
     branches: [ "feature/**" ]
 
+permissions:
+  pull-requests: write
+
 jobs:
   create-pr:
     name: Create PR
@@ -32,3 +35,4 @@ jobs:
           base: main
           labels: enhancement,needs-review
           assignees: ${{ github.actor }}
+          draft: true

@@ -7,3 +7,15 @@ Monorepo pour une suite de diagnostic automobile avec :
 - IA Mistral pour interprétation des codes DTC
 
 ## Structure
+
+## Développement
+
+### Prérequis
+- Docker et Docker Compose
+- Python 3.11+
+- Node.js 20+
+- Flutter (pour le mobile)
+
+### Lancer les tests
+
+#### Backend (Python)

@@ -18,8 +18,9 @@ class HealthCheck(BaseModel):
     version: str = "0.1.0"
 
 @app.get("/", response_model=HealthCheck)
-async def root():
-    """Endpoint de santé"""
+@app.get("/status", response_model=HealthCheck)
+async def health_check():
+    """Endpoint de santé et status"""
     return {"status": "ok", "version": "0.1.0"}
 
 @app.get("/api/hello")
