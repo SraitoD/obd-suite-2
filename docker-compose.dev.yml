@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: obd
+      POSTGRES_PASSWORD: obd_dev
+      POSTGRES_DB: obd
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U obd"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app/backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://obd:obd_dev@db:5432/obd
+      - ENVIRONMENT=development
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web-dev
+    command: npm run dev
+    volumes:
+      - ./web:/app/web
+      - /app/web/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
+
+  mobile:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: mobile-dev
+    volumes:
+      - ./mobile:/app/mobile
+    ports:
+      - "3001:3001"
+    tty: true
+
+volumes:
+  postgres_data:

@@ -1,0 +1,34 @@
+name: Auto PR
+
+on:
+  push:
+    branches: [ "feature/**" ]
+
+jobs:
+  create-pr:
+    name: Create PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat: ${{ github.ref_name }}"
+          title: "feat: ${{ github.ref_name }}"
+          body: |
+            **Type**: feature
+            **Description**:
+            Automatically created from branch `${{ github.ref_name }}`
+
+            **Checklist**:
+            - [ ] Tests added
+            - [ ] Documentation updated
+            - [ ] Ready for review
+          branch: ${{ github.ref_name }}
+          base: main
+          labels: enhancement,needs-review
+          assignees: ${{ github.actor }}
