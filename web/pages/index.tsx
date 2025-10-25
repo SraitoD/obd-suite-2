@@ -1,8 +1,28 @@
-import type { NextPage } from 'next'
+import type { GetServerSideProps, NextPage } from 'next'
 import Head from 'next/head'
+import { getServerSession } from "next-auth/next"
 import { useSession, signIn, signOut } from "next-auth/react"
+import { authOptions } from './api/auth/[...nextauth]'
 
-const Home: NextPage = () => {
+interface VehicleStatus {
+  dtcCount: number
+  lastTrip: {
+    date: string
+    distance: number
+    consumption: number
+  }
+  recentDiagnostics: Array<{
+    code: string
+    description: string
+    status: 'active' | 'monitored' | 'fixed'
+  }>
+}
+
+interface HomeProps {
+  initialStatus: VehicleStatus
+}
+
+const Home: NextPage<HomeProps> = ({ initialStatus }) => {
   const { data: session } = useSession()
 
   return (
@@ -38,28 +58,70 @@ const Home: NextPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">État du véhicule</h2>
-            <div className="text-green-500">✅ Aucun code DTC actif</div>
+            <div className={`text-${initialStatus.dtcCount > 0 ? 'red' : 'green'}-500`}>
+              {initialStatus.dtcCount > 0 ? `⚠️ ${initialStatus.dtcCount} code(s) DTC actif(s)` : "✅ Aucun code DTC actif"}
+            </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">Derniers trajets</h2>
             <div className="space-y-2">
-              <div className="p-2 bg-gray-50 rounded">12/05 - 42 km - Consommation: 6.2L/100km</div>
-              <div className="p-2 bg-gray-50 rounded">11/05 - 18 km - Consommation: 7.1L/100km</div>
+              <div className="p-2 bg-gray-50 rounded">
+                {initialStatus.lastTrip.date} - {initialStatus.lastTrip.distance} km -
+                Consommation: {initialStatus.lastTrip.consumption}L/100km
+              </div>
             </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">Diagnostics récents</h2>
             <div className="space-y-2">
-              <div className="p-2 bg-yellow-50 rounded">P0171 - Mélange trop pauvre (corrigé)</div>
-              <div className="p-2 bg-green-50 rounded">P0300 - Ratés d'allumage (en surveillance)</div>
+              {initialStatus.recentDiagnostics.map((diag, index) => (
+                <div key={index} className={`p-2 rounded ${
+                  diag.status === 'active' ? 'bg-yellow-50' :
+                  diag.status === 'fixed' ? 'bg-green-50' : 'bg-blue-50'
+                }`}>
+                  {diag.code} - {diag.description}
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </main>
     </div>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context.req, context.res, authOptions)
+
+  // Données simulées - en production, appeler l'API backend
+  const initialStatus: VehicleStatus = {
+    dtcCount: 0,
+    lastTrip: {
+      date: "12/05",
+      distance: 42,
+      consumption: 6.2
+    },
+    recentDiagnostics: [
+      { code: "P0171", description: "Mélange trop pauvre (corrigé)", status: "fixed" },
+      { code: "P0300", description: "Ratés d'allumage (en surveillance)", status: "monitored" }
+    ]
+  }
+
+  if (!session) {
+    return {
+      props: {
+        initialStatus
+      }
+    }
+  }
+
+  return {
+    props: {
+      initialStatus
+    }
+  }
 }
 
 export default Home

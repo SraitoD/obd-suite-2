@@ -17,19 +17,29 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
       - name: Install web dependencies
         working-directory: ./web
-        run: npm install
+        run: npm ci
 
-      - name: Lint web
+      - name: Lint and type-check web
         working-directory: ./web
-        run: npm run lint
+        run: |
+          npm run lint
+          npm run type-check
+
+      - name: Build web
+        working-directory: ./web
+        run: npm run build
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+          cache: 'pip'
+          cache-dependency-path: '**/requirements.txt'
 
       - name: Install backend dependencies
         working-directory: ./backend
@@ -58,3 +68,30 @@ jobs:
       - name: Analyze mobile
         working-directory: ./mobile
         run: flutter analyze
+
+      - name: Check formatting
+        working-directory: ./mobile
+        run: flutter format --output=none --set-exit-if-changed .
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      - name: Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'

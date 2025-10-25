@@ -32,6 +32,7 @@ WORKDIR /app/web
 COPY web/package.json web/package-lock.json ./
 RUN npm install
 COPY web/ .
+RUN npm run build
 EXPOSE 3000
 
 # Dev stage
@@ -40,7 +41,6 @@ CMD ["npm", "run", "dev"]
 
 # Prod stage
 FROM web AS web-prod
-RUN npm run build
 CMD ["npm", "start"]
 
 # ----- Mobile -----
