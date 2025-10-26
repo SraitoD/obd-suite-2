@@ -1,6 +1,7 @@
 "use client"
 
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 import { UserCircleIcon } from "@heroicons/react/24/outline"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -18,7 +19,7 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center space-x-4">
-          <span className="font-bold">OBD Suite 2</span>
+          <Link href="/dashboard" className="font-bold">OBD Suite 2</Link>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -38,13 +39,13 @@ export function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuItem>
-                  <Link href="/account" className="flex w-full">
+                <DropdownMenuItem asChild>
+                  <Link href="/account" className="flex w-full cursor-pointer">
                     Mon compte
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/api/auth/signout" className="flex w-full">
+                <DropdownMenuItem asChild>
+                  <Link href="/api/auth/signout" className="flex w-full cursor-pointer">
                     Déconnexion
                   </Link>
                 </DropdownMenuItem>
