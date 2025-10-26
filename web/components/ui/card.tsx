@@ -1,17 +1,13 @@
 import * as React from "react";
-
-export function Card({ className = "", ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={`rounded-xl border p-4 ${className}`} {...props} />;
+export function Card(props: React.HTMLAttributes<HTMLDivElement>) {
+  return <div {...props} className={`rounded-xl border p-4 ${props.className||""}`} />;
 }
-
-export function CardHeader({ className = "", ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={`mb-2 ${className}`} {...props} />;
+export function CardHeader(props: React.HTMLAttributes<HTMLDivElement>) {
+  return <div {...props} className={`mb-2 ${props.className||""}`} />;
 }
-
-export function CardTitle({ className = "", ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h2 className={`text-xl font-semibold ${className}`} {...props} />;
+export function CardTitle(props: React.HTMLAttributes<HTMLHeadingElement>) {
+  return <h2 {...props} className={`text-xl font-semibold ${props.className||""}`} />;
 }
-
-export function CardContent({ className = "", ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={`${className}`} {...props} />;
+export function CardContent(props: React.HTMLAttributes<HTMLDivElement>) {
+  return <div {...props} className={`${props.className||""}`} />;
 }
