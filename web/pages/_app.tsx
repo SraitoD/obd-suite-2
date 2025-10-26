@@ -11,7 +11,8 @@ export default function App({ Component, pageProps }: AppProps) {
       <div className="flex min-h-screen flex-col">
         <Header />
         <main className="flex-1 pb-14 pt-14">
-          <Component {...pageProps} />
+          <Header />
+      <Component {...pageProps} />
         </main>
         <BottomNav />
       </div>
