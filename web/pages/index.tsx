@@ -1,24 +1,16 @@
-import { useSession } from "next-auth/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect } from "react"
+import { useRouter } from "next/router"
 
 export default function Home() {
-  const { data: session, status } = useSession();
-  if (status === "loading") return null;
-  return (
-    <main style={{ padding: 24 }}>
-      <Card>
-        <CardHeader><CardTitle>OBD Suite</CardTitle></CardHeader>
-        <CardContent>
-          {session ? (
-            <p>Bienvenue {session.user?.email}</p>
-          ) : (
-            <p>Bienvenue — pas connecté</p>
-          )}
-        </CardContent>
-      </Card>
-    </main>
-  );
+  const router = useRouter()
+
+  useEffect(() => {
+    router.replace("/dashboard")
+  }, [router])
+
+  return null
 }
 
-// Empêche le SSG (useSession casse en SSG)
-export async function getServerSideProps(){ return { props: {} }; }
+export async function getServerSideProps() {
+  return { props: {} }
+}
